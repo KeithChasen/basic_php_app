@@ -15,7 +15,7 @@ class Database
     public static function getPDOConnection($config)
     {
 
-        if(is_array($config)) {
+        if (is_array($config)) {
             list($driver, $host, $dbname, $port, $dbusername, $dbpassword) = array_values($config);
 
             $dsn = "{$driver}:host={$host};dbname={$dbname};port={$port}";

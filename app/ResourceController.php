@@ -19,7 +19,8 @@ class ResourceController
      */
     public function postStore()
     {
-        return 'New item stored';
+        $name = $_POST['name'];
+        return 'New item stored: User name: ' . $name;
     }
 
     /**
