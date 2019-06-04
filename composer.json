@@ -1,5 +1,12 @@
 {
     "require": {
-        "vlucas/phpdotenv": "^3.3"
+        "vlucas/phpdotenv": "^3.3",
+        "phroute/phroute": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Kernel\\": "Kernel/"
+        }
     }
 }
