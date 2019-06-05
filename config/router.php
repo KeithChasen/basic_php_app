@@ -26,4 +26,4 @@ $r = new Route('/resource/destroy/{id}');
 $r->setMethods(['DELETE'])->setDefaults(['_controller' => [ResourceController::class, 'destroy']]);
 $routes->add('resource_delete', $r);
 
-return $routes;
+//return $routes;
