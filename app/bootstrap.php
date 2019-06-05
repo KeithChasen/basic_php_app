@@ -1,35 +1,44 @@
 <?php
 
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../helpers.php';
 
 use Kernel\Database;
 use Kernel\Config;
 use Dotenv\Dotenv;
-use Phroute\Phroute\Dispatcher;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\HttpKernel;
 
 try {
     Dotenv::create(__DIR__ . '/../')->load();
 
     $pdo = Database::getPDOConnection(Config::parse('db'));
 
+    $routes = require_once __DIR__ . '/../app/router.php';
+
     $request = Request::createFromGlobals();
 
-    $response = new Response();
+    $matcher = new UrlMatcher($routes, new RequestContext());
 
-    $router = require_once __DIR__ . '/../app/router.php';
+    $dispatcher = new EventDispatcher();
+    $dispatcher->addSubscriber(new RouterListener($matcher, new RequestStack()));
 
-    $dispatcher = new Dispatcher($router->getData());
+    $controllerResolver = new ControllerResolver();
+    $argumentResolver = new ArgumentResolver();
 
-    $dispatched = $dispatcher->dispatch(
-        $_SERVER['REQUEST_METHOD'],
-        parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
-    );
+    $kernel = new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver);
 
-    $response->setContent($dispatched);
-
+    $response = $kernel->handle($request);
     $response->send();
+
+    $kernel->terminate($request, $response);
 
 } catch (Exception $e) {
     printException($e);

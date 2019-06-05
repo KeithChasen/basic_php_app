@@ -2,52 +2,80 @@
 
 namespace App;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 class ResourceController
 {
     /**
+     * @return Response
+     *
      * method: GET
-     * route: /resource/
+     * route: /resource
      */
-    public function getIndex()
+    public function index()
     {
-        return 'List of items';
+        return new Response(
+            'List of items'
+        );
     }
 
     /**
+     * @param Request $request
+     * @return Response
+     *
      * method: POST
      * route: /resource/store
      */
-    public function postStore()
+    public function store(Request $request)
     {
-        $name = $_POST['name'];
-        return 'New item stored: User name: ' . $name;
+        $name = $request->get('name');
+        return new Response(
+            'New item stored: User name: ' . $name
+        );
     }
 
     /**
+     * @param $id
+     * @return Response
+     *
      * method: GET
      * route: /resource/show/{id}
      */
-    public function getShow($id)
+    public function show($id)
     {
-        return 'Show item by id. Item id: ' . $id;
+        return new Response(
+            'Show item by id. Item id: ' . $id
+        );
     }
 
     /**
+     * @param Request $request
+     * @param $id
+     * @return Response
+     *
      * method: PUT
      * route: /resource/update/{id}
      */
-    public function putUpdate($id)
+    public function update(Request $request, $id)
     {
-        return 'Item updated. Item id: ' . $id;
+        return new Response(
+            'Item updated. Item id: ' . $id
+        );
     }
 
     /**
      * method: DELETE
      * route: /resource/destroy/{id}
+     *
+     * @param $id
+     * @return string
      */
-    public function deleteDestroy($id)
+    public function destroy($id)
     {
-        return 'Delete item. Item id: ' . $id;
+        return new Response(
+            'Delete item. Item id: ' . $id
+        );
     }
 
 }
