@@ -59,8 +59,9 @@ class ResourceController
      */
     public function update(Request $request, $id)
     {
+        $name = $request->get('name');
         return new Response(
-            'Item updated. Item id: ' . $id
+            'Item updated. Item id: ' . $id . ' User name: ' . $name
         );
     }
 
