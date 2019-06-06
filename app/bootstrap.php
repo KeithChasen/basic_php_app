@@ -9,12 +9,19 @@ use Kernel\Config;
 use Dotenv\Dotenv;
 use Kernel\HTTP;
 
+use Symfony\Component\Routing\Loader\YamlFileLoader;
+use Symfony\Component\Config\FileLocator;
+
 try {
     Dotenv::create(__DIR__ . '/../')->load();
 
     $pdo = Database::getPDOConnection(Config::parse('db'));
 
-    HTTP::run($routes);
+    $fileLocator = new FileLocator();
+    $yamlLoader = new YamlFileLoader($fileLocator);
+
+    //if you prefer not to use yaml routes put $routes variable here as a parameter
+    HTTP::run($yamlLoader->load(__DIR__ . '/../config/routes.yaml'));
 
 } catch (Exception $e) {
     printException($e);

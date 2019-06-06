@@ -11,7 +11,7 @@ class ResourceController
      * @return Response
      *
      * method: GET
-     * route: /resource
+     * route: /
      */
     public function index()
     {
@@ -25,7 +25,7 @@ class ResourceController
      * @return Response
      *
      * method: POST
-     * route: /resource/store
+     * route: /store
      */
     public function store(Request $request)
     {
@@ -40,7 +40,7 @@ class ResourceController
      * @return Response
      *
      * method: GET
-     * route: /resource/show/{id}
+     * route: /show/{id}
      */
     public function show($id)
     {
@@ -55,7 +55,7 @@ class ResourceController
      * @return Response
      *
      * method: PUT
-     * route: /resource/update/{id}
+     * route: /update/{id}
      */
     public function update(Request $request, $id)
     {
@@ -66,7 +66,7 @@ class ResourceController
 
     /**
      * method: DELETE
-     * route: /resource/destroy/{id}
+     * route: /destroy/{id}
      *
      * @param $id
      * @return string

@@ -1,0 +1,24 @@
+index:
+  path: /
+  controller: App\ResourceController::index
+  methods: get
+
+store:
+  path: /store
+  controller: App\ResourceController::store
+  methods: post
+
+show:
+  path: /show/{id}
+  controller: App\ResourceController::show
+  methods: get
+
+update:
+  path: /update/{id}
+  controller: App\ResourceController::update
+  methods: put
+
+destroy:
+  path: /destroy/{id}
+  controller: App\ResourceController::destroy
+  methods: delete
