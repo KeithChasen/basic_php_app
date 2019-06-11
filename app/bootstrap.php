@@ -4,8 +4,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../helpers.php';
 require_once __DIR__ . '/../config/router.php';
 
-use Kernel\Database;
-use Kernel\Config;
 use Dotenv\Dotenv;
 use Kernel\HTTP;
 
@@ -14,8 +12,6 @@ use Symfony\Component\Config\FileLocator;
 
 try {
     Dotenv::create(__DIR__ . '/../')->load();
-
-    $pdo = Database::getPDOConnection(Config::parse('db'));
 
     $fileLocator = new FileLocator();
     $yamlLoader = new YamlFileLoader($fileLocator);
