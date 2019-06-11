@@ -22,3 +22,8 @@ destroy:
   path: /destroy/{id}
   controller: App\ResourceController::destroy
   methods: delete
+
+register:
+  path: /auth/register
+  controller: App\AuthController::register
+  methods: post
