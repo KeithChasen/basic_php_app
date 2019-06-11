@@ -25,7 +25,13 @@ class HTTP
         $kernel = new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver);
 
         $request = Request::createFromGlobals();
+
+        $data = json_decode($request->getContent(), true);
+
+        $request->request->replace(is_array($data) ? $data : []);
+
         $response = $kernel->handle($request);
+
         $response->send();
 
         $kernel->terminate($request, $response);
