@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Hashing\BcryptHasher;
+
 class AuthService extends BasicService
 {
     public function register($email, $password)
@@ -14,7 +16,8 @@ class AuthService extends BasicService
 
         $newUser = $pdo->prepare($sql);
 
-        //todo: add bcrypt to password
+        $bcrypt = new BcryptHasher();
+        $password = $bcrypt->make($password);
 
         $newUser->execute([$email, $password]);
 
