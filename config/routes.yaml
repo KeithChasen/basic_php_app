@@ -27,3 +27,8 @@ register:
   path: /auth/register
   controller: App\AuthController::register
   methods: post
+
+login:
+  path: /auth/login
+  controller: App\AuthController::login
+  methods: post
