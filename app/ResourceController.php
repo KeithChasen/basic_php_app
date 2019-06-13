@@ -2,21 +2,43 @@
 
 namespace App;
 
+use App\Services\BasicService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Exception;
 
 class ResourceController
 {
+    private $basicService;
+
+    public function __construct()
+    {
+        try {
+            $this->basicService = new BasicService();
+        } catch (Exception $e) {
+            printException($e);
+        }
+    }
+
     /**
+     * @param Request $request
      * @return Response
      *
      * method: GET
      * route: /
      */
-    public function index()
+    public function index(Request $request)
     {
+        $authorised = $this->basicService->checkAuth($request);
+
+        if ($authorised) {
+            return new Response(
+                'List of items'
+            );
+        }
+
         return new Response(
-            'List of items'
+            'Authorisation required'
         );
     }
 

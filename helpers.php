@@ -12,3 +12,7 @@ function printException(Exception $e) {
     echo $e->getLine();
     echo "<br>";
 }
+
+function logException(Exception $e) {
+    //todo: create logging function
+}

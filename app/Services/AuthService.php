@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Hashing\BcryptHasher;
+use Lcobucci\JWT\Builder;
 
 class AuthService extends BasicService
 {
@@ -66,12 +67,16 @@ class AuthService extends BasicService
         $passwordsMatch = $this->bcrypt->check($password, $user['password']);
 
         if ($passwordsMatch) {
+
+            $token = $this->createToken($user);
+
             return [
                 'ok' => true,
                 'user' => [
                     'id' => $user['id'],
                     'email' => $user['email']
                 ],
+                'token' => $token,
                 'message' => 'Successfully logged in'
             ];
         }
@@ -79,24 +84,29 @@ class AuthService extends BasicService
         return [
             'ok' => false,
             'user' => null,
+            'token' => null,
             'message' => 'Credentials might be wrong'
         ];
     }
 
     /**
-     * @param $email
-     * @return mixed
+     * @param $user
+     * @return string
      */
-    protected function getUserByEmail($email)
+    protected function createToken($user)
     {
-        $pdo = $this->getPdo();
+        $time = time();
 
-        $sql = "SELECT * FROM users WHERE email = ?";
-
-        $attemptLogin = $pdo->prepare($sql);
-        $attemptLogin->execute([$email]);
-
-        return $attemptLogin->fetch($pdo::FETCH_ASSOC);
+        return (new Builder())
+            ->issuedAt($time)
+            ->issuedBy(getenv('URL'))
+            ->permittedFor(getenv('URL'))
+            ->identifiedBy(getenv('TOKEN_SECRET'), true)
+            ->canOnlyBeUsedAfter($time + 60)
+            ->expiresAt($time + 3600)
+            ->withClaim('id', $user['id'])
+            ->withClaim('email', $user['email'])
+            ->getToken()->__toString();
     }
 
 }

@@ -14,15 +14,22 @@ use Symfony\Component\HttpKernel\HttpKernel;
 
 class HTTP
 {
+    /**
+     * @param $routes
+     * @throws \Exception
+     */
     public static function run($routes)
     {
         $matcher = new UrlMatcher($routes, new RequestContext());
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new RouterListener($matcher, new RequestStack()));
 
-        $controllerResolver = new ControllerResolver();
-        $argumentResolver = new ArgumentResolver();
-        $kernel = new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver);
+        $kernel = new HttpKernel(
+            $dispatcher,
+            new ControllerResolver(),
+            new RequestStack(),
+            new ArgumentResolver()
+        );
 
         $request = Request::createFromGlobals();
 
@@ -31,7 +38,6 @@ class HTTP
         $request->request->replace(is_array($data) ? $data : []);
 
         $response = $kernel->handle($request);
-
         $response->send();
 
         $kernel->terminate($request, $response);
