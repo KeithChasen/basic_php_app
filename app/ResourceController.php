@@ -31,14 +31,14 @@ class ResourceController
     {
         $authorised = $this->basicService->checkAuth($request);
 
-        if ($authorised) {
+        if ($authorised['ok']) {
             return new Response(
                 'List of items'
             );
         }
 
         return new Response(
-            'Authorisation required'
+            $authorised['message']
         );
     }
 

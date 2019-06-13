@@ -33,7 +33,7 @@ class BasicService
 
     /**
      * @param Request $request
-     * @return bool
+     * @return array|bool
      */
     public function checkAuth(Request $request)
     {
@@ -43,27 +43,36 @@ class BasicService
         }
 
         if (!$token) {
-            return false;
+            return ['ok' => false, 'message' => 'No authorisation token provided'];
         }
 
         try {
             $parsedToken = $this->jwtParser->parse($token);
 
-            //todo: check
-            // 1 expired or not
-            // 2 issuedBy(getenv('URL'))
-            // 3 permittedFor(getenv('URL'))
-            // 4 identifiedBy(getenv('TOKEN_SECRET'), true)
+            $expires = $parsedToken->getClaim('exp');
+
+            if ($expires <= time()) {
+                return ['ok' => false, 'message' => 'Your token has been expired'];
+            }
+
+            $url = $parsedToken->getClaim('iss');
+            $secret = $parsedToken->getHeader('jti');
+
+            if ($url !== getenv('URL') || $secret !== getenv('TOKEN_SECRET')) {
+                return ['ok' => false, 'message' => 'Invalid token'];
+            }
 
             $userEmail = $parsedToken->getClaim('email');
         } catch (Exception $e) {
             // todo: log this case:
             // check env variable and if PROD use logException otherwise printException
             printException($e);
-            return false;
+            return ['ok' => false, 'message' => 'Invalid token'];
         }
 
-        return $this->getUserByEmail($userEmail) ? true : false;
+        return $this->getUserByEmail($userEmail) ?
+            ['ok' => true, 'message' => 'success'] :
+            ['ok' => false, 'message' => 'User is not exist'];
     }
 
 
