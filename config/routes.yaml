@@ -32,3 +32,8 @@ login:
   path: /auth/login
   controller: App\AuthController::login
   methods: post
+
+saleseforce_login:
+  path: /saleseforce/login
+  controller: App\SalesForceController::login
+  methods: post
