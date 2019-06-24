@@ -37,3 +37,8 @@ saleseforce_login:
   path: /saleseforce/login
   controller: App\SalesForceController::login
   methods: post
+
+saleseforce_get_group:
+  path: /saleseforce/group/{id}
+  controller: App\SalesForceController::group
+  methods: get

@@ -130,4 +130,35 @@ class SalesForceService
         return $response;
     }
 
+    public function group($id)
+    {
+        $domain = getenv('SALESFORCE_REST_DOMAIN');
+        $groupUrl = getenv('SALESFORCE_GROUP_URL');
+
+        $token = $this->login();
+
+        $url = $domain . $groupUrl . $id;
+
+        if (!filter_var($url, FILTER_VALIDATE_URL) || !$token['ok'] || !$token['session_id'])
+        {
+            return false;
+        }
+
+        $curlInit = curl_init($url);
+
+        $headers = [
+            'Content-Type: application/json',
+            "Authorization: Bearer {$token['session_id']}"
+        ];
+
+        curl_setopt($curlInit, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curlInit, CURLOPT_RETURNTRANSFER, 1);
+
+        $response = curl_exec($curlInit);
+
+        curl_close($curlInit);
+
+        return $response;
+    }
+
 }

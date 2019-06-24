@@ -24,4 +24,13 @@ class SalesForceController
         );
     }
 
+    public function group($id)
+    {
+        $response = $this->salesForceService->group($id);
+
+        return new Response(
+            $response
+        );
+    }
+
 }
