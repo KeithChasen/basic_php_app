@@ -38,43 +38,48 @@ class BasicService
     public function checkAuth(Request $request)
     {
         $token = null;
-        if (array_key_exists('authorization', $request->headers->all())) {
-            $token = str_replace('Bearer ', '', $request->headers->all()['authorization'][0]);
-        }
 
-        if (!$token) {
-            return ['ok' => false, 'message' => 'No authorisation token provided'];
-        }
+        if (array_key_exists('authorization', $request->headers->all()))
+            $token = str_replace('Bearer ', '', $request->headers->all()['authorization'][0]);
+
+        if (!$token)
+            return $this->response(false, 'No authorisation token provided');
 
         try {
             $parsedToken = $this->jwtParser->parse($token);
-
             $expires = $parsedToken->getClaim('exp');
 
-            if ($expires <= time()) {
-                return ['ok' => false, 'message' => 'Your token has been expired'];
-            }
+            if ($expires <= time())
+                return $this->response(false, 'Your token has been expired');
 
             $url = $parsedToken->getClaim('iss');
             $secret = $parsedToken->getHeader('jti');
 
-            if ($url !== getenv('URL') || $secret !== getenv('TOKEN_SECRET')) {
-                return ['ok' => false, 'message' => 'Invalid token'];
-            }
+            if ($url !== getenv('URL') || $secret !== getenv('TOKEN_SECRET'))
+                return $this->response(false, 'Invalid token');
 
             $userEmail = $parsedToken->getClaim('email');
         } catch (Exception $e) {
             // todo: log this case:
             // check env variable and if PROD use logException otherwise printException
             printException($e);
-            return ['ok' => false, 'message' => 'Invalid token'];
+            return $this->response(false, 'Invalid token');
         }
 
         return $this->getUserByEmail($userEmail) ?
-            ['ok' => true, 'message' => 'success'] :
-            ['ok' => false, 'message' => 'User is not exist'];
+            $this->response(true, 'success') :
+            $this->response(false, 'User is not exist');
     }
 
+    /**
+     * @param $ok
+     * @param $message
+     * @return array
+     */
+    protected function response($ok, $message)
+    {
+        return ['ok' => $ok, 'message' => $message];
+    }
 
     /**
      * @param $email

@@ -3,7 +3,7 @@
 namespace App\Services;
 
 
-class SalesForceService
+class SalesForceService extends BasicService
 {
     /**
      * @param $xml
@@ -44,42 +44,40 @@ class SalesForceService
     {
         $response = $this->performLogin();
 
-        if (!$response) {
-            return [
-                'ok' => false,
-                'session_id' => null,
-                'message' => 'Unexpected CURL error'
-            ];
-        }
+        if (!$response)
+            return $this->sfResponse(false, null, 'Unexpected CURL error');
 
         $xml = simplexml_load_string($response);
 
         $soapError = $this->checkError($xml);
 
-        if ($soapError) {
-            return [
-                'ok' => false,
-                'session_id' => null,
-                'message' => $soapError
-            ];
-        }
+        if ($soapError)
+            return $this->sfResponse(false, null, $soapError);
 
         $sessionId = $this->getSessionId($xml);
 
-        if ($sessionId) {
-            return [
-                'ok' => true,
-                'session_id' => $sessionId,
-                'message' => 'success'
-            ];
-        }
+        if ($sessionId)
+            return $this->sfResponse(true, $sessionId,'success');
 
+        return $this->sfResponse(false, null, 'No session id in response');
+
+    }
+
+    /**
+     * Format response
+     *
+     * @param $ok
+     * @param $sessionId
+     * @param $message
+     * @return array
+     */
+    protected function sfResponse($ok, $sessionId, $message)
+    {
         return [
-            'ok' => false,
-            'session_id' => null,
-            'message' => 'No session id in response'
+            'ok' => $ok,
+            'session_id' => $sessionId,
+            'message' => $message
         ];
-
     }
 
     /**

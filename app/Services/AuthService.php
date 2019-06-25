@@ -27,12 +27,8 @@ class AuthService extends BasicService
     {
         $userExists = $this->getUserByEmail($email);
 
-        if (!empty($userExists)) {
-            return [
-                'ok' => false,
-                'message' => 'User with such email already exists. Please log in.'
-            ];
-        }
+        if (!empty($userExists))
+            return $this->registerResponse(false,  'User with such email already exists. Please log in.');
 
         $password = $this->bcrypt->make($password);
 
@@ -41,18 +37,19 @@ class AuthService extends BasicService
         $newUser = $pdo->prepare($sql);
         $newUser->execute([$email, $password]);
 
-        if ($pdo->lastInsertId()) {
-            return [
-                'ok' => true,
-                'message' => 'Successfully registered. Now you can log in.'
-            ];
-        }
+        if ($pdo->lastInsertId())
+            return $this->registerResponse( true, 'Successfully registered. Now you can log in.');
 
+        return $this->registerResponse( false, 'Something went wrong. Please try again');
+
+    }
+
+    protected function registerResponse($ok, $message)
+    {
         return [
-            'ok' => false,
-            'message' => 'Something went wrong. Please try again'
+            'ok' => $ok,
+            'message' => $message
         ];
-
     }
 
     /**
@@ -67,25 +64,25 @@ class AuthService extends BasicService
         $passwordsMatch = $this->bcrypt->check($password, $user['password']);
 
         if ($passwordsMatch) {
-
             $token = $this->createToken($user);
-
-            return [
-                'ok' => true,
-                'user' => [
-                    'id' => $user['id'],
-                    'email' => $user['email']
-                ],
-                'token' => $token,
-                'message' => 'Successfully logged in'
+            $user = [
+                'id' => $user['id'],
+                'email' => $user['email']
             ];
+
+            return $this->loginResponse(true, $user, $token, 'Successfully logged in');
         }
 
+        return $this->loginResponse(false, null, null, 'Credentials might be wrong');
+    }
+
+    protected function loginResponse($ok, $user, $token, $message)
+    {
         return [
-            'ok' => false,
-            'user' => null,
-            'token' => null,
-            'message' => 'Credentials might be wrong'
+            'ok' => $ok,
+            'user' => $user,
+            'token' => $token,
+            'message' => $message
         ];
     }
 
